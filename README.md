@@ -2,7 +2,7 @@
 ## Testing
 
 1. **Test ArgentX Implementation**:
-   - Open `http://localhost:8000` in your browser
+   - Open `http://127.0.0.1:5500/src/index.html` in your browser
    - Make sure ArgentX wallet is installed and unlocked
    - The default values should be:
      - Account Address: `0x01b175fe86400121641d32d47490f76cd1ff973a6f090631496c0a08a530ed18`
