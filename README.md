@@ -1,10 +1,10 @@
 # StarkNet Message Hash Testing
 
-This project demonstrates and compares StarkNet message hashing implementations in two versions:
+This minimal-example demonstrates and compares StarkNet message hashing implementations in two versions:
 - JavaScript (using ArgentX wallet)
 - Rust (custom implementation)
 
-## Running Tests
+## Hashing
 
 1. **Start HTTP server:**
    ```bash
