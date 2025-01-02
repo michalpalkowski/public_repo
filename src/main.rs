@@ -32,7 +32,7 @@ fn calculate_message_hash(
         encode_string(version),
         encode_string(chain_id),
     ];
-    
+
     let domain_hash = Pedersen::hash_array(&domain_struct);
     println!("Domain hash: 0x{:x}", domain_hash);
 
@@ -46,12 +46,12 @@ fn calculate_message_hash(
         encode_string(account_address),
         encode_string(message),
     ];
-    
+
     let message_hash = Pedersen::hash_array(&message_struct);
     println!("Message hash: 0x{:x}", message_hash);
 
     // Calculate final hash
-    
+
     Pedersen::hash_array(&[
         encode_string("StarkNet Message"),
         domain_hash,
@@ -75,6 +75,7 @@ fn main() {
     println!("Chain ID: {}", chain_id);
     println!("\nHashing steps:");
 
-    let message_hash = calculate_message_hash(account_address, message, dapp_name, version, chain_id);
+    let message_hash =
+        calculate_message_hash(account_address, message, dapp_name, version, chain_id);
     println!("\nFinal hash: 0x{:x}", message_hash);
 }
