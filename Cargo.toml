@@ -1,0 +1,9 @@
+[package]
+name = "public_repo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hex = "0.4.3"
+starknet = "0.12.0"
+starknet-types-core = "0.1.7"
