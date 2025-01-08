@@ -14,6 +14,19 @@ fn encode_string(s: &str) -> Felt {
     }
 }
 
+#[derive(Debug)]
+struct StarkNetDomain {
+    name: Felt,
+    version: Felt,
+    chain_id: Felt,
+}
+
+#[derive(Debug)]
+struct Message {
+    account_address: Felt,
+    message: Felt,
+}
+
 fn calculate_message_hash(
     account_address: &str,
     message: &str,
@@ -21,41 +34,43 @@ fn calculate_message_hash(
     version: &str,
     chain_id: &str,
 ) -> Felt {
-    // Calculate domain separator
-    let domain_type_str = r#""StarkNetDomain"("name":"felt","chainId":"felt","version":"felt")"#;
-    let domain_type_hash = starknet_keccak(domain_type_str.as_bytes());
-    println!("Domain type hash: 0x{:x}", domain_type_hash);
+    // Domain separator calculation
+    let domain = StarkNetDomain {
+        name: encode_string(dapp_name),
+        version: encode_string(version),
+        chain_id: encode_string(chain_id),
+    };
 
+    let domain_type_hash = starknet_keccak("StarkNetDomain(name:felt,version:felt,chainId:felt)".as_bytes());
     let domain_struct = vec![
-        domain_type_hash,
-        encode_string(dapp_name),
-        encode_string(version),
-        encode_string(chain_id),
+        Felt::from(domain_type_hash),
+        domain.name,
+        domain.version,
+        domain.chain_id,
     ];
-
     let domain_hash = Pedersen::hash_array(&domain_struct);
     println!("Domain hash: 0x{:x}", domain_hash);
 
-    // Calculate message hash
-    let message_type_str = r#""Message"("account_address":"felt","message":"felt")"#;
-    let message_type_hash = starknet_keccak(message_type_str.as_bytes());
-    println!("Message type hash: 0x{:x}", message_type_hash);
+    // Message hash calculation
+    let msg = Message {
+        account_address: encode_string(account_address),
+        message: encode_string(message),
+    };
 
+    let message_type_hash = starknet_keccak("Message(account_address:felt,message:felt)".as_bytes());
     let message_struct = vec![
-        message_type_hash,
-        encode_string(account_address),
-        encode_string(message),
+        Felt::from(message_type_hash),
+        msg.account_address,
+        msg.message,
     ];
-
     let message_hash = Pedersen::hash_array(&message_struct);
     println!("Message hash: 0x{:x}", message_hash);
 
-    // Calculate final hash
-
+    // Final hash calculation
     Pedersen::hash_array(&[
         encode_string("StarkNet Message"),
         domain_hash,
-        encode_string(account_address),
+        msg.account_address,
         message_hash,
     ])
 }
