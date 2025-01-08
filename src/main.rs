@@ -41,7 +41,8 @@ fn calculate_message_hash(
         chain_id: encode_string(chain_id),
     };
 
-    let domain_type_hash = starknet_keccak("StarkNetDomain(name:felt,version:felt,chainId:felt)".as_bytes());
+    let domain_type_hash =
+        starknet_keccak("StarkNetDomain(name:felt,version:felt,chainId:felt)".as_bytes());
     let domain_struct = vec![
         Felt::from(domain_type_hash),
         domain.name,
@@ -57,7 +58,8 @@ fn calculate_message_hash(
         message: encode_string(message),
     };
 
-    let message_type_hash = starknet_keccak("Message(account_address:felt,message:felt)".as_bytes());
+    let message_type_hash =
+        starknet_keccak("Message(account_address:felt,message:felt)".as_bytes());
     let message_struct = vec![
         Felt::from(message_type_hash),
         msg.account_address,
