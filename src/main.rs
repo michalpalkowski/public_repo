@@ -1,10 +1,10 @@
 use hex;
 use starknet::core::utils::starknet_keccak;
+use starknet_crypto::verify;
 use starknet_types_core::{
     felt::Felt,
     hash::{Pedersen, StarkHash},
 };
-use starknet_crypto::{verify, Signature};
 
 fn encode_string(s: &str) -> Felt {
     if s.starts_with("0x") {
@@ -124,13 +124,15 @@ fn main() {
         temporary_public_key,
     );
     println!("\nFinal hash: 0x{:x}", message_hash);
-    
-    let public_key = Felt::from_hex("0x3f7b2d0ed3d5eca3e0e2a80dfbdd60f981fa6faee2a4f6995980362f7dd4793").unwrap();
-    let r = Felt::from_hex("0x6e73b7b094ca892a5f68be0f2fb6e4fa6098e364d4112a215994599105fd665").unwrap();
-    let s = Felt::from_hex("0x799216b1ac1cb79a6ce3e311a0086d0d7f6ad005b4c41399425df0c1d9983ac").unwrap();
+
+    let public_key =
+        Felt::from_hex("0x3f7b2d0ed3d5eca3e0e2a80dfbdd60f981fa6faee2a4f6995980362f7dd4793")
+            .unwrap();
+    let r = Felt::from_hex("0x6e73b7b094ca892a5f68be0f2fb6e4fa6098e364d4112a215994599105fd665")
+        .unwrap();
+    let s = Felt::from_hex("0x799216b1ac1cb79a6ce3e311a0086d0d7f6ad005b4c41399425df0c1d9983ac")
+        .unwrap();
 
     let is_valid = verify(&public_key, &message_hash, &r, &s);
     println!("\nECDSA signature verification result: {:?}", is_valid);
 }
-
-
