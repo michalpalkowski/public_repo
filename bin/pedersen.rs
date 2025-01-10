@@ -4,7 +4,6 @@ use starknet_types_core::{
     felt::Felt,
     hash::{Pedersen, StarkHash},
 };
-use starknet_crypto::{verify, Signature};
 
 fn encode_string(s: &str) -> Felt {
     if s.starts_with("0x") {
@@ -26,9 +25,6 @@ struct StarkNetDomain {
 struct Message {
     account_address: Felt,
     message: Felt,
-    nonce: Felt,
-    issued_at: Felt,
-    temporary_public_key: Felt,
 }
 
 fn calculate_message_hash(
@@ -37,9 +33,6 @@ fn calculate_message_hash(
     dapp_name: &str,
     version: &str,
     chain_id: &str,
-    nonce: &str,
-    issued_at: &str,
-    temporary_public_key: &str,
 ) -> Felt {
     // Domain separator calculation
     let domain = StarkNetDomain {
@@ -63,22 +56,14 @@ fn calculate_message_hash(
     let msg = Message {
         account_address: encode_string(account_address),
         message: encode_string(message),
-        nonce: encode_string(nonce),
-        issued_at: encode_string(issued_at),
-        temporary_public_key: encode_string(temporary_public_key),
     };
 
     let message_type_hash =
-        starknet_keccak(
-            "Message(account_address:felt,message:felt,nonce:felt,issued_at:felt,temporary_public_key:felt)".as_bytes()
-        );
+        starknet_keccak("Message(account_address:felt,message:felt)".as_bytes());
     let message_struct = vec![
         Felt::from(message_type_hash),
         msg.account_address,
         msg.message,
-        msg.nonce,
-        msg.issued_at,
-        msg.temporary_public_key,
     ];
     let message_hash = Pedersen::hash_array(&message_struct);
     println!("Message hash: 0x{:x}", message_hash);
@@ -98,9 +83,6 @@ fn main() {
     let dapp_name = "Example DApp";
     let version = "0.0.1";
     let chain_id = "SN_SEPOLIA";
-    let nonce = "JLFX1HWTq9AkOUQj6";
-    let issued_at = "2025-01-10T08:48:36.063Z";
-    let temporary_public_key = "0x5b48dcbd15b8eab614c8df5ceccbfdaf111b0f15118d4089ea735c0ebcc2613";
 
     println!("\nInput values:");
     println!("Account: {}", account_address);
@@ -108,29 +90,9 @@ fn main() {
     println!("DApp name: {}", dapp_name);
     println!("Version: {}", version);
     println!("Chain ID: {}", chain_id);
-    println!("Nonce: {}", nonce);
-    println!("Issued At: {}", issued_at);
-    println!("Temporary Public Key: {}", temporary_public_key);
     println!("\nHashing steps:");
 
-    let message_hash = calculate_message_hash(
-        account_address,
-        message,
-        dapp_name,
-        version,
-        chain_id,
-        nonce,
-        issued_at,
-        temporary_public_key,
-    );
+    let message_hash =
+        calculate_message_hash(account_address, message, dapp_name, version, chain_id);
     println!("\nFinal hash: 0x{:x}", message_hash);
-    
-    let public_key = Felt::from_hex("0x3f7b2d0ed3d5eca3e0e2a80dfbdd60f981fa6faee2a4f6995980362f7dd4793").unwrap();
-    let r = Felt::from_hex("0x6e73b7b094ca892a5f68be0f2fb6e4fa6098e364d4112a215994599105fd665").unwrap();
-    let s = Felt::from_hex("0x799216b1ac1cb79a6ce3e311a0086d0d7f6ad005b4c41399425df0c1d9983ac").unwrap();
-
-    let is_valid = verify(&public_key, &message_hash, &r, &s);
-    println!("\nECDSA signature verification result: {:?}", is_valid);
 }
-
-
