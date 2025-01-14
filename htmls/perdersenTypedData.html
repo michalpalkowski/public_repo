@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ArgentX Hash Example</title>
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <div>
+            <input type="text" id="accountAddress" placeholder="Account Address" value="0x01b175fe86400121641d32d47490f76cd1ff973a6f090631496c0a08a530ed18">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="message" placeholder="Message" value="Hello Argent!">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="dappName" placeholder="DApp Name" value="Example DApp">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="version" placeholder="Version" value="0.0.1">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="chainId" placeholder="Chain ID" value="SN_SEPOLIA">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="nonce" placeholder="Nonce" value="">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="issuedAt" placeholder="Issued At" value="">
+        </div>
+        <div style="margin-top: 10px;">
+            <input type="text" id="tempPublicKey" placeholder="Temporary Public Key" value="">
+        </div>
+        <div style="margin-top: 20px;">
+            <button onclick="hashMessage()" style="margin-right: 10px;">Hash Message</button>
+            <button onclick="signMessage()" style="margin: 0 10px;">Sign Message</button>
+            <button onclick="verifySignature()" style="margin-left: 10px;">Verify Signature</button>
+        </div>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        // Initialize values when page loads
+        window.onload = function() {
+            // Set default values
+            document.getElementById('accountAddress').value = 
+                '0x01b175fe86400121641d32d47490f76cd1ff973a6f090631496c0a08a530ed18';
+            
+            document.getElementById('message').value = 'Hello Argent!';
+            document.getElementById('dappName').value = 'Example DApp';
+            document.getElementById('version').value = '0.0.1';
+            document.getElementById('chainId').value = 'SN_SEPOLIA';
+            
+            // Set new fields with example data
+            document.getElementById('nonce').value = 'JFGeskPZkf421bLAd';
+            document.getElementById('issuedAt').value = '2025-01-09T23:57:05.813Z';
+            document.getElementById('tempPublicKey').value = 
+                '0x7e46439f0bcb5293ca41b4b4e82b8c048e3505ed86e16e57644e004ddff871e';
+        };
+
+        async function getNonce() {
+            // Return the predefined nonce instead of generating new one
+            return document.getElementById('nonce').value;
+        }
+
+        async function hashMessage() {
+            if (!window.starknet) {
+                alert('Please install ArgentX wallet!');
+                return;
+            }
+
+            try {
+                await window.starknet.enable();
+                const starknetProvider = window.starknet;
+                
+                const nonce = await getNonce();
+                document.getElementById('nonce').value = nonce;
+                
+                const typedData = {
+                    types: {
+                        StarkNetDomain: [
+                            { name: 'name', type: 'felt' },
+                            { name: 'version', type: 'felt' },
+                            { name: 'chainId', type: 'felt' }
+                        ],
+                        Message: [
+                            { name: 'account_address', type: 'felt' },
+                            { name: 'message', type: 'felt' },
+                            { name: 'nonce', type: 'felt' },
+                            { name: 'issued_at', type: 'felt' },
+                            { name: 'temporary_public_key', type: 'felt' }
+                        ]
+                    },
+                    primaryType: 'Message',
+                    domain: {
+                        name: document.getElementById('dappName').value,
+                        version: document.getElementById('version').value,
+                        chainId: document.getElementById('chainId').value
+                    },
+                    message: {
+                        account_address: document.getElementById('accountAddress').value,
+                        message: document.getElementById('message').value,
+                        nonce: document.getElementById('nonce').value,
+                        issued_at: document.getElementById('issuedAt').value,
+                        temporary_public_key: document.getElementById('tempPublicKey').value
+                    }
+                };
+
+                console.log('\nInput values:');
+                console.log('Account:', typedData.message.account_address);
+                console.log('Message:', typedData.message.message);
+                console.log('DApp:', typedData.domain.name);
+                console.log('Version:', typedData.domain.version);
+                console.log('Chain ID:', typedData.domain.chainId);
+                console.log('Nonce:', typedData.message.nonce);
+                console.log('Issued At:', typedData.message.issued_at);
+                console.log('Temporary Public Key:', typedData.message.temporary_public_key);
+                console.log('\nTyped Data:', typedData);
+
+                // Używamy account zamiast getAccountFromAddress
+                const contractAccount = starknetProvider.account;
+                const hashedMessage = await contractAccount.hashMessage(typedData);
+                
+                document.getElementById('result').innerHTML = 
+                    `<pre>
+Input values:
+Account: ${typedData.message.account_address}
+Message: ${typedData.message.message}
+DApp: ${typedData.domain.name}
+Version: ${typedData.domain.version}
+Chain ID: ${typedData.domain.chainId}
+Nonce: ${typedData.message.nonce}
+Issued At: ${typedData.message.issued_at}
+Temporary Public Key: ${typedData.message.temporary_public_key}
+
+Hashed message: ${hashedMessage}
+</pre>`;
+                    
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            }
+        }
+
+        async function verifySignature() {
+            if (!window.starknet) {
+                alert('Please install ArgentX wallet!');
+                return;
+            }
+
+            try {
+                await window.starknet.enable();
+                const starknetProvider = window.starknet;
+                
+                const signature = {
+                    r: '0x1a7c881c813e1136d6f735b117df9b7b5881d569e786452d7e5a3b1747b6cc4',
+                    s: '0x2002530ca0ba699359824e53042de138314266b52109508b223645d87f07720'
+                };
+
+                const accountAddress = document.getElementById('accountAddress').value;
+                const contractAccount = starknetProvider.account;
+                
+                const typedData = {
+                    types: {
+                        StarkNetDomain: [
+                            { name: 'name', type: 'felt' },
+                            { name: 'version', type: 'felt' },
+                            { name: 'chainId', type: 'felt' }
+                        ],
+                        Message: [
+                            { name: 'account_address', type: 'felt' },
+                            { name: 'message', type: 'felt' },
+                            { name: 'nonce', type: 'felt' },
+                            { name: 'issued_at', type: 'felt' },
+                            { name: 'temporary_public_key', type: 'felt' }
+                        ]
+                    },
+                    primaryType: 'Message',
+                    domain: {
+                        name: document.getElementById('dappName').value,
+                        version: document.getElementById('version').value,
+                        chainId: document.getElementById('chainId').value
+                    },
+                    message: {
+                        account_address: document.getElementById('accountAddress').value,
+                        message: document.getElementById('message').value,
+                        nonce: document.getElementById('nonce').value,
+                        issued_at: document.getElementById('issuedAt').value,
+                        temporary_public_key: document.getElementById('tempPublicKey').value
+                    }
+                };
+
+                const hashedMessage = await contractAccount.hashMessage(typedData);
+                
+                // Weryfikuj sygnaturę
+                const isValid = await contractAccount.verifyMessage(typedData, [signature.r, signature.s]);
+                
+                document.getElementById('result').innerHTML = 
+                    `<pre>
+Signature Verification Results:
+Message Hash: ${hashedMessage}
+Signature r: ${signature.r}
+Signature s: ${signature.s}
+Is Valid: ${isValid}
+</pre>`;
+                            
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            }
+        }
+
+        async function signMessage() {
+            if (!window.starknet) {
+                alert('Please install ArgentX wallet!');
+                return;
+            }
+
+            try {
+                await window.starknet.enable();
+                const starknetProvider = window.starknet;
+                
+                const nonce = await getNonce();
+                document.getElementById('nonce').value = nonce;
+                
+                const typedData = {
+                    types: {
+                        StarkNetDomain: [
+                            { name: 'name', type: 'felt' },
+                            { name: 'version', type: 'felt' },
+                            { name: 'chainId', type: 'felt' }
+                        ],
+                        Message: [
+                            { name: 'account_address', type: 'felt' },
+                            { name: 'message', type: 'felt' },
+                            { name: 'nonce', type: 'felt' },
+                            { name: 'issued_at', type: 'felt' },
+                            { name: 'temporary_public_key', type: 'felt' }
+                        ]
+                    },
+                    primaryType: 'Message',
+                    domain: {
+                        name: document.getElementById('dappName').value,
+                        version: document.getElementById('version').value,
+                        chainId: document.getElementById('chainId').value
+                    },
+                    message: {
+                        account_address: document.getElementById('accountAddress').value,
+                        message: document.getElementById('message').value,
+                        nonce: document.getElementById('nonce').value,
+                        issued_at: document.getElementById('issuedAt').value,
+                        temporary_public_key: document.getElementById('tempPublicKey').value
+                    }
+                };
+
+                const contractAccount = starknetProvider.account;
+                const signature = await contractAccount.signMessage(typedData);
+                const hashedMessage = await contractAccount.hashMessage(typedData);
+                
+                document.getElementById('result').innerHTML = 
+                    `<pre>
+Signature Results:
+Message Hash: ${hashedMessage}
+Signature r: ${signature[0]}
+Signature s: ${signature[1]}
+
+Full signature array: ${JSON.stringify(signature, null, 2)}
+</pre>`;
+                    
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
