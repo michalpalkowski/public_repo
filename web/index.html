@@ -12,14 +12,10 @@
         <p id="result"></p>
     </div>
 
-    <div style="text-align: center; margin-top: 50px;">
-        <p style="color: green; font-weight: bold;">Deposit transaction details are appearing</p>
-        <button onclick="Deposit()" style="margin-top: 20px;">Deposit</button>
-        <p id="result"></p>
-    </div>
-
     <p style="text-align: center; color: blue; margin-top: 20px; font-style: italic;">
-        Verify Proof transaction details are not appearing despite having the same transaction details as Deposit
+        $ cd web <br>
+        $ python -m http.server 8000 <br>
+        open browser http://localhost:8000
     </p>
 
     <script>
@@ -108,59 +104,6 @@
                         "0x03e7f1de1fb282a222624bb5da8dfd34368f2f31a3e9d742a980062510d5cc41",
                         "verify_proof_initial",
                         initialCalldata
-                    ]
-                ], walletAddress);
-
-                console.log('Prepared transaction:', preparedTransaction);
-
-                const initial_result = await starknetProvider.account.execute(
-                    preparedTransaction.transactions,
-                    preparedTransaction.transactionsDetail
-                );
-
-                document.getElementById('result').innerHTML = `
-                    <div class="success-message">
-                        <h3>Transaction Submitted</h3>
-                        <pre>${JSON.stringify(initial_result, null, 2)}</pre>
-                        <div class="transaction-details">
-                            <h4>Transaction Details:</h4>
-                            <pre>${JSON.stringify(preparedTransaction.transactionsDetail, null, 2)}</pre>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                document.getElementById('result').innerHTML = `
-                    <div style="color: red; padding: 10px;">
-                        Error: ${error.message}
-                        <br>
-                        Please try again in a few seconds.
-                    </div>
-                `;
-            }
-        }
-
-        async function Deposit() {
-            if (!window.starknet) {
-                alert('Please install ArgentX wallet and refresh the page');
-                return;
-            }
-
-            try {
-                await window.starknet.enable();
-                
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                if (!window.starknet.account) {
-                    throw new Error('Please connect your wallet first');
-                }
-
-                const starknetProvider = window.starknet;
-                const walletAddress = starknetProvider.account.address;
-                const preparedTransaction = await PrepareTransaction.new([
-                    [
-                        "0x354593c6291013ece3106c573f882a3a41dc08b5715cf9d7be2bbb9eab2b8d9",
-                        "deposit",
-                        ["0x1", "0x2"]
                     ]
                 ], walletAddress);
 
