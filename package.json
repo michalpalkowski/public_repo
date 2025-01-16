@@ -1,0 +1,17 @@
+{
+  "name": "public_repo",
+  "version": "1.0.0",
+  "description": "1. **Start HTTP server:**    ```bash    # In the web directory    cd web    python -m http.server 8000    ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@argent/x-sessions": "^7.0.0",
+    "get-starknet": "^3.3.3",
+    "starknet": "^6.11.0"
+  }
+}

@@ -12,3 +12,20 @@
    - Click "Verify Proof" button
    - Click "Deposit" button
 
+3. **Test session keys Implementation:**
+   ```npm init -y```
+
+   ```npm install starknet```
+
+   ```npm install @argent/x-sessions```
+
+   ```cd session_keys```
+
+   ```open with live server```
+
+4. **Test session keys Implementation using vite:**
+   ``` cd my_session_keys```
+   ``` npm install```
+   ```npm run dev```
+
+   Open http://localhost:5173 in your browser
